@@ -71,12 +71,12 @@ func updateTodoHandler(c echo.Context) error {
 
 
 // xorm method
-func getTodos() {
+func getTodos() error {
 	var err error
 	engine, err = xorm.NewEngine("mysql", "root:1234@tcp(127.0.0.1:3306)/go")
 	if err != nil {
 		log.Println("sippai", err)
-		return
+		return err
 	}
 
 	results, err := engine.Query("SELECT * FROM todo")
@@ -93,26 +93,34 @@ func getTodos() {
 
 	engine.ShowSQL(true)
 	engine.SetMapper(core.GonicMapper{})
+	return err
 }
 
-func deleteTodo(id int) {
+func deleteTodo(id int) error {
 	t := Todo{}
 	affected, err := engine.Where("id=?", id).Delete(t)
+	delete(todoList, id) //配列からも削除
 	if err != nil {
 		log.Println(affected, err)
+		return err
 	}
+	return err
 }
 
-func saveTodo(todo *Todo){
+func saveTodo(todo *Todo) error {
 	affected, err := engine.Insert(todo)
 	if err != nil {
 		log.Println(affected, err)
+		return err
 	}
+	return err
 }
 
-func updateTodo(todo *Todo) {
+func updateTodo(todo *Todo) error {
 	affected, err := engine.Where("id=?", todo.Id).Update(todo)
 	if err != nil {
 		log.Println(affected, err)
+		return err
 	}
+	return err
 }

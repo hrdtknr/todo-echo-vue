@@ -47,13 +47,13 @@ export default {
       .catch((error) => console.log(error));
   },
   methods: {
-    getTodo: function() {
+    getTodo: function () {
       axios
         .get("http://localhost:8000/todoList")
         .then((response) => (this.todoList = response.data))
         .catch((error) => console.log(error));
     },
-    updateTodo: function(todo) {
+    updateTodo: function (todo) {
       axios
         .put("http://localhost:8000/todoList", {
           id: todo.id,
@@ -62,7 +62,7 @@ export default {
         })
         .catch((error) => console.log(error));
     },
-    deleteTodo: function(delId) {
+    deleteTodo: function (delId) {
       const params = { id: delId };
       const qs = new URLSearchParams(params);
       axios
