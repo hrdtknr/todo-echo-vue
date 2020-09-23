@@ -41,31 +41,58 @@ e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 	}))
 	*/
+	/*
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
     AllowOrigins:     []string{"*"},
     AllowHeaders:     []string{"authorization", "Content-Type"},
     AllowCredentials: true,
     AllowMethods:     []string{echo.OPTIONS, echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 }))
+*/
+e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+			req := c.Request()
+
+			headers := c.Response().Header()
+			headers.Set("Access-Control-Allow-Origin", "*")
+			headers.Set("Access-Control-Allow-Headers", "Authorization")
+			headers.Set("Access-Control-Allow-Methods", "GET, PATCH, PUT, POST, DELETE, OPTIONS")
+
+			if "OPTIONS" != req.Method {
+					h(c)
+			}
+
+			return nil
+	}
+})
 	// Routes
 	e.GET("/todoList", handler)
-	e.DELETE("/todoList/:id", delete)
-	e.POST("/todoList", save)
+	e.DELETE("/todoList", deleteTodo)
+	e.POST("/todoList", saveTodo) // "/"にしたけど違いそう
 	// Start server
 	e.Logger.Fatal(e.Start(":8000"))
 }
 
 func handler(c echo.Context) error {
+	log.Println("handler") // insert delete ここにきてる
 	return c.JSON(http.StatusOK, todoList)
 }
 
-func delete(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+func deleteTodo(c echo.Context) error {
+	log.Println("delete")
+//	log.Println(c.Param("Id"))
+	id2 := c.QueryParam("id") //クエリパラメータで送ってるから受け取り方がc.Paramではない
+	log.Println("query id2:", id2)
+
+
+	id, _ := strconv.Atoi(c.Param("Id"))
 	log.Println("id:",id)
 	return c.NoContent(http.StatusNoContent)
 }
 
-func save(c echo.Context) error {
+func saveTodo(c echo.Context) error {
+	log.Println("save")
+	log.Println("\n\nc",c)
 	t := new(Todo)
 	if err := c.Bind(t); err != nil {
 			return err

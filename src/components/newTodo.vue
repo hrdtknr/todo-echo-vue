@@ -17,7 +17,7 @@ export default {
     };
   },
   methods: {
-    createTodo: function() {
+    createTodo: function () {
       if (!this.newName && !this.newTodo) {
         alert("NameかTodoのどちらかは入力してください");
       } else {
