@@ -97,12 +97,10 @@ func getTodos() error {
 
 func deleteTodo(id int) error {
 	t := Todo{}
-	log.Println("id;", id)
-	log.Println("before\n", todoList)
 	affected, err := engine.Where("id=?", id).Delete(t)
-	log.Println("after\n", todoList)
+	delete(todoList, id)
 	if err != nil {
-		log.Println("error",affected, err)
+		log.Println("error", affected, err)
 		return err
 	}
 	return err
