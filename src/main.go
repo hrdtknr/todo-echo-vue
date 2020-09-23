@@ -48,24 +48,24 @@ e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
     AllowMethods:     []string{echo.OPTIONS, echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 }))
 	// Routes
-	e.GET("/todoList", h)
-	e.DELETE("/todoList/:id", d)
-	e.POST("/todoList", s)
+	e.GET("/todoList", handler)
+	e.DELETE("/todoList/:id", delete)
+	e.POST("/todoList", save)
 	// Start server
 	e.Logger.Fatal(e.Start(":8000"))
 }
 
-func h(c echo.Context) error {
+func handler(c echo.Context) error {
 	return c.JSON(http.StatusOK, todoList)
 }
 
-func d(c echo.Context) error {
+func delete(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	log.Println("id:",id)
 	return c.NoContent(http.StatusNoContent)
 }
 
-func s(c echo.Context) error {
+func save(c echo.Context) error {
 	t := new(Todo)
 	if err := c.Bind(t); err != nil {
 			return err
