@@ -28,7 +28,7 @@ func main() {
 
 	e := echo.New()
 
-	getTodos()
+	//getTodos()
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -46,6 +46,7 @@ func main() {
 }
 
 func handler(c echo.Context) error {
+	getTodos()
 	log.Println("handler") // insert ここにきてる
 	return c.JSON(http.StatusOK, todoList)
 }
@@ -79,12 +80,11 @@ func updateTodo(c echo.Context) error {
 
 func getTodos() {
 	var err error
-	engine, err := xorm.NewEngine("mysql", "root:1234@tcp(127.0.0.1:3306)/go")
+	engine, err = xorm.NewEngine("mysql", "root:1234@tcp(127.0.0.1:3306)/go")
 	if err != nil {
 		log.Println("sippai", err)
 		return
 	}
-	defer engine.Close()
 
 	results, err := engine.Query("SELECT * FROM todo")
 
@@ -104,13 +104,10 @@ func getTodos() {
 
 func del(id int) {
 	t := Todo{}
-	log.Println("engine", engine) //渡ってない
 	affected, err := engine.Where("id=?", id).Delete(&t)
-	log.Println("del3")
 	if err != nil {
 		log.Println(affected, err)
 	}
-	log.Println("del4")
 }
 
 func upd(todo *Todo) {
