@@ -25,59 +25,52 @@ var (
 )
 
 func main() {
-
 	e := echo.New()
-
-	//getTodos()
-
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
-
 	// Routes
-	e.GET("/todoList", handler)
-	e.DELETE("/todoList", deleteTodo)
-	e.POST("/todoList", saveTodo)
-	e.PUT("/todoList", updateTodo)
-
+	e.GET("/todoList", getTodoHandler)
+	e.DELETE("/todoList", deleteTodoHandler)
+	e.POST("/todoList", saveTodoHandler)
+	e.PUT("/todoList", updateTodoHandler)
 	// Start server
 	e.Logger.Fatal(e.Start(":8000"))
 }
 
-func handler(c echo.Context) error {
+// echo method
+func getTodoHandler(c echo.Context) error {
 	getTodos()
-	log.Println("handler") // insert ここにきてる
 	return c.JSON(http.StatusOK, todoList)
 }
 
-func deleteTodo(c echo.Context) error {
-	log.Println("delete")
+func deleteTodoHandler(c echo.Context) error {
 	id, _ := strconv.Atoi(c.QueryParam("id"))
-	del(id)
+	deleteTodo(id)
 	return c.NoContent(http.StatusNoContent)
 }
 
-func saveTodo(c echo.Context) error {
-	log.Println("save")
-	log.Println("\n\nc", c)
-	t := new(Todo)
-	if err := c.Bind(t); err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, t)
-}
-
-func updateTodo(c echo.Context) error {
+func saveTodoHandler(c echo.Context) error {
 	todo := new(Todo)
 	if err := c.Bind(todo); err != nil {
 		return err
 	}
-	log.Println("todo", todo)
-	upd(todo)
-	return nil // 仮
+	saveTodo(todo)
+	return c.JSON(http.StatusOK, todo)
 }
 
+func updateTodoHandler(c echo.Context) error {
+	todo := new(Todo)
+	if err := c.Bind(todo); err != nil {
+		return err
+	}
+	updateTodo(todo)
+	return c.JSON(http.StatusOK, todo)
+}
+
+
+// xorm method
 func getTodos() {
 	var err error
 	engine, err = xorm.NewEngine("mysql", "root:1234@tcp(127.0.0.1:3306)/go")
@@ -102,17 +95,23 @@ func getTodos() {
 	engine.SetMapper(core.GonicMapper{})
 }
 
-func del(id int) {
+func deleteTodo(id int) {
 	t := Todo{}
-	affected, err := engine.Where("id=?", id).Delete(&t)
+	affected, err := engine.Where("id=?", id).Delete(t)
 	if err != nil {
 		log.Println(affected, err)
 	}
 }
 
-func upd(todo *Todo) {
-	log.Println("engine", engine)
-	affected, err := engine.Where("id=?", todo.Id).Update(&todo)
+func saveTodo(todo *Todo){
+	affected, err := engine.Insert(todo)
+	if err != nil {
+		log.Println(affected, err)
+	}
+}
+
+func updateTodo(todo *Todo) {
+	affected, err := engine.Where("id=?", todo.Id).Update(todo)
 	if err != nil {
 		log.Println(affected, err)
 	}
