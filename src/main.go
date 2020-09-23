@@ -69,7 +69,6 @@ func updateTodoHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, todo)
 }
 
-
 // xorm method
 func getTodos() error {
 	var err error
@@ -98,10 +97,12 @@ func getTodos() error {
 
 func deleteTodo(id int) error {
 	t := Todo{}
+	log.Println("id;", id)
+	log.Println("before\n", todoList)
 	affected, err := engine.Where("id=?", id).Delete(t)
-	delete(todoList, id) //配列からも削除
+	log.Println("after\n", todoList)
 	if err != nil {
-		log.Println(affected, err)
+		log.Println("error",affected, err)
 		return err
 	}
 	return err
