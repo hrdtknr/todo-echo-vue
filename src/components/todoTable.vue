@@ -51,7 +51,7 @@ export default {
       axios
         .get("http://localhost:8000/todoList")
         .then((response) => (this.todoList = response.data))
-        .then(() => console.log(this.todoList))
+        .then(() => console.log("axios.get内 delete後再取得", this.todoList))
         .catch((error) => console.log(error));
     },
     updateTodo: function (todo) {
