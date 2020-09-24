@@ -51,7 +51,6 @@ export default {
       axios
         .get("http://localhost:8000/todoList")
         .then((response) => (this.todoList = response.data))
-        .then(() => console.log("axios.get内 delete後再取得", this.todoList))
         .catch((error) => console.log(error));
     },
     updateTodo: function (todo) {
@@ -63,8 +62,8 @@ export default {
         })
         .catch((error) => console.log(error));
     },
-    deleteTodo: function (delId) {
-      const params = { id: delId };
+    deleteTodo: function (id) {
+      const params = { id: id };
       const qs = new URLSearchParams(params);
       axios
         .delete(`http://localhost:8000/todoList?${qs}`)
